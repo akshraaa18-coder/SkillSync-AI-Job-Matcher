@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillSync helps students compare resumes with job descriptions and track applications.">
+    <title>SkillSync | Job Matching & Career Workspace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar">
+        <a class="logo" href="#dashboard">Skill<span>Sync.</span></a>
+        <p class="menu-label">WORKSPACE</p>
+        <a href="#dashboard" class="nav-link active">▦ Dashboard</a>
+        <a href="#analyzer" class="nav-link">◈ Resume Analyzer</a>
+        <a href="#history" class="nav-link">◷ Analysis History</a>
+        <a href="#tracker" class="nav-link">▤ Applications</a>
+        <div class="sidebar-bottom">
+            <p>SkillSync v1.0</p>
+            <small>Designed for career growth.</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR CAREER WORKSPACE</p>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="profile" aria-label="SkillSync profile">S</div>
+        </header>
+
+        <section id="dashboard">
+            <div class="welcome-card">
+                <div>
+                    <p class="eyebrow">CAREER INTELLIGENCE</p>
+                    <h2>Build your next opportunity.</h2>
+                    <p>Analyze your skills, discover job gaps, and stay on top of your applications.</p>
+                    <a href="#analyzer" class="primary-btn">Analyze My Resume →</a>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card"><p>Total Applications</p><h2 id="totalApps">0</h2></article>
+                <article class="stat-card"><p>Interviews</p><h2 id="interviews">0</h2></article>
+                <article class="stat-card"><p>Selected</p><h2 id="selected">0</h2></article>
+                <article class="stat-card"><p>Rejected</p><h2 id="rejected">0</h2></article>
+            </div>
+        </section>
+
+        <section id="analyzer" class="section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">RESUME INTELLIGENCE</p>
+                    <h2>Resume Analyzer</h2>
+                    <p>Compare your resume with a job description and identify relevant skill gaps.</p>
+                </div>
+            </div>
+
+            <div class="analyzer-grid">
+                <div class="panel">
+                    <h3>Analyze a job opportunity</h3>
+                    <form id="analyzeForm">
+                        <label for="jobTitle">Job Role</label>
+                        <input type="text" id="jobTitle" name="job_title" maxlength="150"
+                               placeholder="e.g. Software Engineer Intern">
+
+                        <label for="companyName">Company</label>
+                        <input type="text" id="companyName" name="company" maxlength="100"
+                               placeholder="e.g. Example Technologies">
+
+                        <label for="resume">Resume (PDF, maximum 5 MB)</label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,application/pdf" required>
+
+                        <label for="jobDescription">Job Description</label>
+                        <textarea id="jobDescription" name="job_description" maxlength="50000"
+                                  placeholder="Paste the job or internship description here..." required></textarea>
+
+                        <button type="submit" class="primary-btn full-btn" id="analyzeButton">
+                            Analyze Resume →
+                        </button>
+                    </form>
+                    <p id="message" class="message" role="status" aria-live="polite"></p>
+                </div>
+
+                <div class="panel result-panel">
+                    <h3>Analysis Results</h3>
+                    <div id="emptyState" class="empty-state">
+                        <div class="empty-icon">◎</div>
+                        <h3>Ready to analyze?</h3>
+                        <p>Upload a resume and paste a job description to see your results.</p>
+                    </div>
+
+                    <div id="results" hidden>
+                        <div class="score-circle" id="scoreCircle">
+                            <h2 id="score">0%</h2>
+                            <p>Match Score</p>
+                        </div>
+                        <div class="score-details">
+                            <p><span>Text Similarity</span><strong id="similarity">0%</strong></p>
+                            <p><span>Skill Coverage</span><strong id="coverage">0%</strong></p>
+                        </div>
+                        <p class="result-note">This is an estimated text-and-skill match, not a hiring probability.</p>
+
+                        <h4>Matched Skills</h4>
+                        <div id="matchedSkills" class="skill-list"></div>
+
+                        <h4>Missing Skills</h4>
+                        <div id="missingSkills" class="skill-list"></div>
+
+                        <h4>Skills Detected in Your Resume</h4>
+                        <div id="resumeSkills" class="skill-list"></div>
+
+                        <h4>Resume Improvement Suggestions</h4>
+                        <div id="suggestions" class="suggestions-box"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="history" class="section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">PREVIOUS ANALYSES</p>
+                    <h2>Analysis History</h2>
+                    <p>Review your recent resume comparisons.</p>
+                </div>
+                <button class="secondary-btn" id="refreshHistory" type="button">Refresh</button>
+            </div>
+            <div class="panel table-panel">
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Company</th><th>Job Role</th><th>Match Score</th><th>Date</th></tr></thead>
+                        <tbody id="historyList"><tr><td colspan="4">No analysis history yet.</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tracker" class="section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">CAREER PROGRESS</p>
+                    <h2>Application Tracker</h2>
+                    <p>Keep your internship and job applications organized.</p>
+                </div>
+            </div>
+
+            <div class="tracker-grid">
+                <div class="panel">
+                    <h3>Add an application</h3>
+                    <form id="applicationForm">
+                        <label for="company">Company Name</label>
+                        <input id="company" type="text" maxlength="100" required placeholder="e.g. Example Technologies">
+
+                        <label for="role">Job Role</label>
+                        <input id="role" type="text" maxlength="150" required placeholder="e.g. Software Engineer Intern">
+
+                        <label for="status">Application Status</label>
+                        <select id="status">
+                            <option>Applied</option><option>Interview</option>
+                            <option>Selected</option><option>Rejected</option>
+                        </select>
+
+                        <label for="jobUrl">Job URL (optional)</label>
+                        <input id="jobUrl" type="url" maxlength="500" placeholder="https://...">
+
+                        <button class="primary-btn full-btn" type="submit">+ Add Application</button>
+                    </form>
+                    <p id="trackerMessage" class="message" role="status" aria-live="polite"></p>
+                </div>
+
+                <div class="panel chart-panel">
+                    <h3>Application Overview</h3>
+                    <div class="chart-wrap"><canvas id="applicationChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="panel table-panel applications-panel">
+                <h3>Your Applications</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Company</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="applicationsList"><tr><td colspan="4">No applications yet.</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <footer>SkillSync © 2026 · Built to support smarter career decisions.</footer>
+    </main>
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
